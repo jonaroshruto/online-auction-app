@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Online Auction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    <!-- Navigation Bar -->
+    <header class="bg-blue-600 text-white shadow-md">
+        <nav class="container mx-auto p-4 flex justify-between items-center">
+            <div>
+                <a href="#" class="text-xl font-bold">AuctionHub</a>
+            </div>
+            <div class="space-x-6">
+                <a href="#" class="hover:underline">Home</a>
+                <a href="#" class="hover:underline">Browse Auctions</a>
+                <a href="#" class="hover:underline">My Auctions</a>
+                <a href="#" class="hover:underline">Contact Us</a>
+                <a href="#" class="bg-blue-700 py-2 px-4 rounded hover:bg-blue-800">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-cover bg-center h-screen text-white" style="background-image: url('https://example.com/auction-banner.jpg');">
+        <div class="container mx-auto h-full flex items-center justify-center text-center">
+            <div class="bg-opacity-50 bg-black p-10 rounded">
+                <h1 class="text-5xl font-bold mb-6">Welcome to AuctionHub</h1>
+                <p class="text-xl mb-6">Bid on exclusive items and win your dream deals</p>
+                <a href="#" class="bg-blue-600 py-3 px-6 rounded-full text-lg hover:bg-blue-700">Start Bidding</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Auctions Section -->
+    <section class="container mx-auto py-12">
+        <h2 class="text-3xl font-bold text-center mb-10">Featured Auctions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Auction Item 1 -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <img src="https://example.com/item1.jpg" alt="Item 1" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold">Antique Vase</h3>
+                    <p class="text-gray-700 mt-2">Current Bid: $500</p>
+                    <a href="#" class="text-blue-600 hover:underline mt-4 block">Place Bid</a>
+                </div>
+            </div>
+            <!-- Auction Item 2 -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <img src="https://example.com/item2.jpg" alt="Item 2" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold">Vintage Car</h3>
+                    <p class="text-gray-700 mt-2">Current Bid: $25,000</p>
+                    <a href="#" class="text-blue-600 hover:underline mt-4 block">Place Bid</a>
+                </div>
+            </div>
+            <!-- Auction Item 3 -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <img src="https://example.com/item3.jpg" alt="Item 3" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold">Luxury Watch</h3>
+                    <p class="text-gray-700 mt-2">Current Bid: $1,200</p>
+                    <a href="#" class="text-blue-600 hover:underline mt-4 block">Place Bid</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 AuctionHub. All rights reserved.</p>
+            <p><a href="#" class="text-blue-400 hover:underline">Privacy Policy</a> | <a href="#" class="text-blue-400 hover:underline">Terms of Service</a></p>
+        </div>
+    </footer>
+</body>
+</html>
