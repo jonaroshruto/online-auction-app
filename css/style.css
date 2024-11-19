@@ -1,13 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
 :root {
-    --primary-color: #2196F3;
-    --secondary-color: #1976D2;
-    --accent-color: #FFC107;
-    --text-color: #333;
-    --background-color: #f5f5f5;
-    --error-color: #f44336;
-    --success-color: #4CAF50;
+    --primary-color: #2563eb;
+    --secondary-color: #1d4ed8;
+    --accent-color: #f59e0b;
+    --text-color: #1f2937;
+    --background-color: #f3f4f6;
+    --error-color: #dc2626;
+    --success-color: #16a34a;
     --border-radius: 8px;
     --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    --heading-font: 'Poppins', sans-serif;
+    --body-font: 'Inter', sans-serif;
+    --purple-color: #7c3aed;
+    --teal-color: #0d9488;
 }
 
 * {
@@ -17,7 +23,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--body-font);
     line-height: 1.6;
     color: var(--text-color);
     background-color: var(--background-color);
@@ -46,29 +52,108 @@ nav {
     align-items: center;
 }
 
-.btn-primary, .btn-secondary {
-    padding: 0.5rem 1.5rem;
-    border: none;
+/* Standardize all action buttons */
+.btn-primary,
+.btn-secondary,
+#loginBtn,
+#registerBtn,
+#logoutBtn,
+#resetAuctionsBtn {
+    padding: 0.8rem;
     border-radius: var(--border-radius);
-    cursor: pointer;
+    font-size: 0.95rem;
     font-weight: 500;
-    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: var(--body-font);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
 }
 
-.btn-primary {
+/* Individual button colors */
+#loginBtn, 
+.btn-primary[type="submit"] {
     background-color: var(--primary-color);
     color: white;
+    border: none;
 }
 
-.btn-secondary {
-    background-color: white;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
+#registerBtn {
+    background-color: var(--purple-color);
+    color: white;
+    border: none;
 }
 
-.btn-primary:hover, .btn-secondary:hover {
+.my-bids-button {
+    background-color: var(--teal-color) !important;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#logoutBtn {
+    background-color: var(--error-color);
+    color: white;
+    border: none;
+}
+
+#resetAuctionsBtn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+}
+
+/* Hover states */
+#loginBtn:hover,
+.btn-primary[type="submit"]:hover {
+    background-color: var(--secondary-color);
+}
+
+#registerBtn:hover {
+    background-color: #6d28d9;
+}
+
+.my-bids-button:hover {
+    background-color: #0f766e !important;
     transform: translateY(-2px);
-    box-shadow: var(--box-shadow);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
+
+#logoutBtn:hover {
+    background-color: #b91c1c;
+}
+
+#resetAuctionsBtn:hover {
+    background-color: #d97706;
+}
+
+/* Common hover effects */
+.btn-primary:hover,
+.btn-secondary:hover,
+.my-bids-button:hover,
+#loginBtn:hover,
+#registerBtn:hover,
+#logoutBtn:hover,
+#resetAuctionsBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Update nav buttons spacing */
+.auth-buttons,
+.user-info {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
 }
 
 main {
@@ -172,13 +257,13 @@ main {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
 }
 
 .item-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 }
 
 .item-image {
@@ -294,48 +379,53 @@ main {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
-    left: 0;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    animation: fadeIn 0.3s;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal.visible {
+    opacity: 1;
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    width: 90%;
-    max-width: 500px;
-    position: relative;
-    animation: slideIn 0.3s;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 90%;
+    width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideIn {
-    from { transform: translateY(-100px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+.modal-content::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
 
 .close {
     position: absolute;
-    right: 20px;
+    right: 15px;
     top: 10px;
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 24px;
     cursor: pointer;
-    transition: color 0.2s;
+    color: #666;
+    transition: color 0.2s ease;
 }
 
 .close:hover {
-    color: var(--error-color);
+    color: #000;
 }
 
 .form-group {
@@ -635,7 +725,7 @@ footer {
     padding: 1rem 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    animation: slideIn 0.3s ease-out;
+    animation: toastSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
     min-width: 300px;
     max-width: 400px;
@@ -668,13 +758,13 @@ footer {
 }
 
 /* Animations */
-@keyframes slideIn {
+@keyframes toastSlideIn {
     from {
-        transform: translateX(100%);
+        transform: translateX(100%) translateY(10%);
         opacity: 0;
     }
     to {
-        transform: translateX(0);
+        transform: translateX(0) translateY(0);
         opacity: 1;
     }
 }
@@ -764,26 +854,33 @@ footer {
 
 /* Bid History Button styling */
 .bid-history-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.8rem 1.2rem;
-    background: #e8f5e9;
-    border: 1px solid #4caf50;
-    border-radius: 8px;
     cursor: pointer;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: #f8f9fa;
+    color: var(--text-color);
     transition: all 0.2s ease;
-    color: #2e7d32;
-    font-weight: 500;
-    margin-top: 1rem;
-    width: fit-content;
-    gap: 1rem;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .bid-history-button:hover {
-    background: #c8e6c9;
+    background-color: #e9ecef;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.no-bids-button {
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.no-bids-button:hover {
+    opacity: 1;
 }
 
 .bid-count-wrapper {
@@ -822,11 +919,15 @@ footer {
 
 .bid-history-container {
     margin-top: 1.5rem;
-    max-height: 50vh;
+    max-height: 300px;
     overflow-y: auto;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 8px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding-right: 4px;
+}
+
+.bid-history-container::-webkit-scrollbar {
+    display: none;
 }
 
 .current-price {
@@ -948,13 +1049,20 @@ footer {
 
 /* My Bids Button */
 .my-bids-button {
-    background-color: var(--primary-color);
+    background-color: var(--teal-color);
     color: white;
-    margin-right: 1rem;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .my-bids-button:hover {
-    background-color: var(--secondary-color);
+    background-color: #0f766e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
 }
 
 /* My Bids Modal */
@@ -968,16 +1076,19 @@ footer {
     color: #666;
 }
 
-/* Password Input Styling */
+/* Update Password Input Styling */
 .password-input-group .password-wrapper {
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .password-toggle {
     position: absolute;
     right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
     background: none;
     border: none;
     cursor: pointer;
@@ -985,19 +1096,553 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.password-toggle:hover {
-    opacity: 0.8;
+    z-index: 2; /* Ensure button is clickable */
 }
 
 .eye-icon {
     fill: #666;
     width: 20px;
     height: 20px;
+    pointer-events: none; /* Prevent SVG from blocking clicks */
 }
 
 .password-wrapper input {
-    padding-right: 40px;
+    width: 100%;
+    padding-right: 40px !important; /* Ensure space for the icon */
+}
+
+/* Enhanced Card Styling */
+.item-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.item-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.item-card:hover .item-image img {
+    transform: scale(1.05);
+}
+
+/* Enhanced Button Styling */
+.bid-button {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bid-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+}
+
+/* Enhanced Modal Styling */
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+}
+
+/* Enhanced Form Input Styling */
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+/* Enhanced Price Display */
+.bid-amount {
+    font-family: var(--heading-font);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Enhanced Time Display */
+.time-left {
+    font-family: var(--heading-font);
+    font-weight: 600;
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Loading State Animation */
+@keyframes shimmer {
+    0% {
+        background-position: -468px 0;
+    }
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+.loading {
+    background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+    background-size: 800px 104px;
+    animation: shimmer 1.2s infinite linear;
+}
+
+/* Enhanced Toast Notifications */
+.toast-notification {
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-left: 4px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toast-notification.success {
+    border-left-color: var(--success-color);
+}
+
+.toast-notification.error {
+    border-left-color: var(--error-color);
+}
+
+/* Enhanced Section Headers */
+.section-header h2 {
+    font-family: var(--heading-font);
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 1rem;
+}
+
+/* Bid Details Modal Styling */
+.bid-details-modal {
+    max-width: 800px;
+    width: 90%;
+    height: 90vh;
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.bid-details-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.bid-overview {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.bid-history-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .bid-details-modal {
+        width: 95%;
+        height: 80vh;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .bid-overview {
+        padding: 1.5rem;
+    }
+}
+
+/* Close button styling */
+.bid-details-modal .close {
+    position: absolute;
+    right: 1.5rem;
+    top: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 2;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+
+.bid-details-modal .close:hover {
+    background: rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
+
+/* Bid Metrics Styling */
+.bid-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1.5rem;
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    border-radius: var(--border-radius);
+    margin: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.metric-card {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0.5rem 0;
+    font-family: var(--heading-font);
+}
+
+.metric-label {
+    color: #666;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-icon {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive adjustments for bid metrics */
+@media (max-width: 768px) {
+    .bid-metrics {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
+
+/* Update action buttons container */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.bid-button, .view-details-btn {
+    flex: 1;
+    padding: 0.8rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.view-details-btn {
+    background-color: #f8f9fa;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.view-details-btn:hover {
+    background-color: #e9ecef;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.auction-ended {
+    flex: 1;
+    text-align: center;
+    padding: 0.8rem;
+    background: #ffebee;
+    border-radius: var(--border-radius);
+    color: var(--error-color);
+    font-weight: 500;
+}
+
+/* Add styles for item details modal */
+.item-details-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .item-details-content {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.item-details-content .item-image {
+    width: 100%;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+}
+
+.item-details-content .item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.item-info .description {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+.item-info .current-price {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.item-info .time-info {
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.bid-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: var(--border-radius);
+}
+
+.metric-card {
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.metric-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.metric-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.metric-label {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    margin-top: 0.25rem;
+}
+
+.modal-actions {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.auction-ended-message {
+    text-align: center;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    background: #ffebee;
+    color: var(--error-color);
+    border-radius: var(--border-radius);
+    font-weight: 500;
+}
+
+/* Standardize buttons in item cards */
+.item-card .bid-button,
+.item-card .bid-history-button {
+    width: 100%;
+    height: 40px;
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: var(--body-font);
+    letter-spacing: 0.025em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.item-card .bid-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.item-card .bid-history-button {
+    background-color: white;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+.item-card .bid-button:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.item-card .bid-history-button:hover {
+    background-color: rgba(37, 99, 235, 0.1);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure buttons are in a column with consistent spacing */
+.item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.item-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    width: 100%;
+    align-items: center;
+}
+
+.item-card .bid-button,
+.view-details-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.8rem;
+    margin: 0;
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-family: var(--body-font);
+    transition: all 0.2s ease;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-sizing: border-box;
+}
+
+.item-card .bid-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin: 0;
+    padding: 0.8rem;
+}
+
+.item-card .bid-button:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Form submit buttons */
+#loginForm button[type="submit"],
+#registerForm button[type="submit"] {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#loginForm button[type="submit"] {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+#registerForm button[type="submit"] {
+    background-color: var(--purple-color);
+    color: white;
+}
+
+/* Hover states */
+#loginForm button[type="submit"]:hover {
+    background-color: var(--secondary-color);
+}
+
+#registerForm button[type="submit"]:hover {
+    background-color: #6d28d9;
 }
   

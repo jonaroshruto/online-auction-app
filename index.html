@@ -62,7 +62,7 @@
                             </button>
                         </div>
                     </div>
-                    <button type="submit" class="btn-primary">Login</button>
+                    <button type="submit" class="btn-primary" data-action="login">Login</button>
                 </form>
                 <p class="modal-footer">
                     Don't have an account? 
@@ -103,7 +103,7 @@
                             </button>
                         </div>
                     </div>
-                    <button type="submit" class="btn-primary">Register</button>
+                    <button type="submit" class="btn-primary" data-action="register">Create Account</button>
                 </form>
                 <p class="modal-footer">
                     Already have an account? 
@@ -133,6 +133,34 @@
                     </div>
                     <button type="submit" class="btn-primary">Place Bid</button>
                 </form>
+            </div>
+        </div>
+
+        <!-- Bid Details Modal -->
+        <div id="bidDetailsModal" class="modal">
+            <div class="modal-content bid-details-modal">
+                <span class="close">&times;</span>
+                <h2 class="bid-details-title">Bid Details</h2>
+                <div class="bid-details-container">
+                    <div class="bid-overview">
+                        <div class="current-price"></div>
+                        <div class="bid-metrics">
+                            <div class="metric">
+                                <span class="metric-label">Total Bids</span>
+                                <span class="metric-value total-bids">0</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Unique Bidders</span>
+                                <span class="metric-value unique-bidders">0</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Avg. Increment</span>
+                                <span class="metric-value avg-increment">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bid-history-list"></div>
+                </div>
             </div>
         </div>
     </main>

@@ -67,22 +67,33 @@ function calculateTimeLeft(endTime) {
     return `${seconds}s`;
 }
 
-// Add event listeners when page loads
+// Update the initialization approach
 document.addEventListener('DOMContentLoaded', () => {
-    loadItems(); // Load items when page loads
-    
-    // Add search functionality
+    initializeApp();
+});
+
+function initializeApp() {
+    loadItems();
+    setupEventListeners();
+    setupPasswordToggles();
+    updateUserInterface();
+}
+
+function setupEventListeners() {
+    // Search functionality
     const searchInput = document.getElementById('searchInput');
+    searchInput.removeEventListener('input', handleSearch); // Remove existing listener
     searchInput.addEventListener('input', handleSearch);
     
-    // Add sort functionality
+    // Sort functionality
     const sortSelect = document.getElementById('sortSelect');
+    sortSelect.removeEventListener('change', handleSort); // Remove existing listener
     sortSelect.addEventListener('change', handleSort);
     
-    // Add modal functionality
+    // Modal handlers
     setupModalHandlers();
     setupPasswordToggles();
-});
+}
 
 // Search function
 function handleSearch() {
@@ -137,7 +148,7 @@ function saveUserBid(itemId, bidAmount) {
     localStorage.setItem('userBids', JSON.stringify(userBids));
 }
 
-// Update the submitBid function to include saving user bid
+// Update the submitBid function
 async function submitBid(itemId, bidAmount) {
     if (!isLoggedIn()) {
         showToast('Please login to place a bid', 'info');
@@ -159,6 +170,12 @@ async function submitBid(itemId, bidAmount) {
     }
 
     try {
+        // Initialize bid history if it doesn't exist
+        if (!item.bidHistory) {
+            item.bidHistory = [];
+        }
+
+        // Add new bid
         item.bidHistory.push({
             username: user.username,
             amount: bidAmount,
@@ -166,17 +183,24 @@ async function submitBid(itemId, bidAmount) {
         });
         item.currentBid = bidAmount;
         
+        // Save to localStorage
         localStorage.setItem('auctionItems', JSON.stringify(allItems));
+        
+        // Save to user's bid history
         saveUserBid(itemId, bidAmount);
         
+        // Update UI
         updateItemUI(item);
+        displayFilteredItems(allItems);
+        
         showToast(`Bid of KES ${bidAmount.toLocaleString()} placed successfully on ${item.name}`, 'success');
     } catch (error) {
+        console.error('Error placing bid:', error);
         showToast('Failed to place bid. Please try again.', 'error');
     }
 }
 
-// Add this new function to update a single item's UI
+// Update the updateItemUI function
 function updateItemUI(item) {
     const itemCard = document.querySelector(`.item-card[data-item-id="${item.id}"]`);
     if (!itemCard) return;
@@ -190,15 +214,12 @@ function updateItemUI(item) {
     // Update bid history button/count
     const bidHistoryContainer = itemCard.querySelector('.bid-status');
     if (bidHistoryContainer) {
-        // First, determine the bid text
-        const bidText = item.bidHistory.length === 1 ? 'Bid' : 'Bids';
-
-        // Then use it in the template literal
         const bidHistoryHTML = `
-            <button onclick="showBidHistory('${item.id}')" class="bid-history-button">
+            <button onclick="showBidHistory('${item.id}')" 
+                    class="bid-history-button ${item.bidHistory?.length === 0 ? 'no-bids-button' : ''}">
                 <div class="bid-count-wrapper">
-                    <span class="bid-count">${item.bidHistory.length}</span>
-                    <span class="bid-text">${bidText}</span>
+                    <span class="bid-count">${item.bidHistory?.length || 0}</span>
+                    <span class="bid-text">${item.bidHistory?.length === 1 ? 'Bid' : 'Bids'}</span>
                 </div>
                 <span class="view-all">View History →</span>
             </button>
@@ -212,48 +233,63 @@ function updateItemUI(item) {
     }
 }
 
-// Function to load bid history
-async function loadBidHistory(itemId) {
+// Update the showBidHistory function
+function showBidHistory(itemId) {
+    if (!isLoggedIn()) {
+        showLoginPrompt();
+        return;
+    }
+
     const item = allItems.find(item => item.id === parseInt(itemId));
-    if (!item) {
-        showToast('Item not found', 'error');
-        return;
-    }
+    if (!item) return;
 
-    const bidHistoryContent = document.getElementById('bidHistoryContent');
-    if (item.bidHistory.length === 0) {
-        bidHistoryContent.innerHTML = '<p class="no-bids-message">No bids yet</p>';
-        return;
-    }
-
-    const bidsHtml = item.bidHistory
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-        .map((bid, index) => `
-            <div class="bid-entry ${index === 0 ? 'latest-bid' : ''}">
-                <div class="bid-info-main">
-                    <span class="bid-amount">KES ${bid.amount.toLocaleString()}</span>
-                    ${index === 0 ? '<span class="latest-badge">Latest Bid</span>' : ''}
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content bid-history-modal">
+            <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+            <h2>Bid History - ${item.name}</h2>
+            <div class="bid-history-container">
+                <div class="current-price">
+                    Current Bid: KES ${item.currentBid.toLocaleString()}
                 </div>
-                <div class="bid-info-secondary">
-                    <span class="bidder">${bid.username}</span>
-                    <span class="bid-time">${new Date(bid.timestamp).toLocaleString()}</span>
-                </div>
+                ${item.bidHistory?.length === 0 ? 
+                    '<p class="no-bids-message">No bids have been placed yet. Be the first to bid!</p>' :
+                    `<div class="bid-list">
+                        ${item.bidHistory
+                            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                            .map(bid => `
+                                <div class="bid-entry">
+                                    <div class="bid-info-main">
+                                        <span class="bid-amount">KES ${bid.amount.toLocaleString()}</span>
+                                        <span class="bidder">${bid.username}</span>
+                                    </div>
+                                    <div class="bid-info-secondary">
+                                        <span class="bid-time">${new Date(bid.timestamp).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                    </div>`
+                }
             </div>
-        `).join('');
-
-    bidHistoryContent.innerHTML = `
-        <div class="current-price">
-            Current Bid: KES ${item.currentBid.toLocaleString()}
         </div>
-        ${bidsHtml}
     `;
+    document.body.appendChild(modal);
+    showModal(modal);
+
+    // Add event listener for modal removal
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            hideModal(modal);
+            setTimeout(() => modal.remove(), 300); // Remove after animation
+        }
+    });
 }
 
-// Update the displayFilteredItems function to include data-item-id
+// Update displayFilteredItems to properly set up item cards
 function displayFilteredItems(items) {
     const container = document.getElementById('itemsContainer');
-    container.innerHTML = '';
-
+    
     if (items.length === 0) {
         container.innerHTML = `
             <div class="no-results">
@@ -264,61 +300,51 @@ function displayFilteredItems(items) {
         return;
     }
 
-    items.forEach(item => {
+    container.innerHTML = items.map(item => {
         const timeLeft = calculateTimeLeft(item.endTime);
         const isEnded = timeLeft === 'Auction ended';
         
-        const card = document.createElement('div');
-        card.className = `item-card ${isEnded ? 'auction-ended-card' : ''}`;
-        card.setAttribute('data-item-id', item.id);
-        
-        // Extract the ternary operation into a separate variable
-        const bidText = item.bidHistory.length === 1 ? 'Bid' : 'Bids';
-        
-        const bidHistoryButton = item.bidHistory.length > 0 ? `
-            <button onclick="showBidHistory('${item.id}')" class="bid-history-button">
-                <div class="bid-count-wrapper">
-                    <span class="bid-count">${item.bidHistory.length}</span>
-                    <span class="bid-text">${bidText}</span>
+        return `
+            <div class="item-card ${isEnded ? 'auction-ended-card' : ''}" data-item-id="${item.id}">
+                <div class="item-image">
+                    <img src="${item.image}" alt="${item.name}">
                 </div>
-                <span class="view-all">View History →</span>
-            </button>
-        ` : '<span class="no-bids">No bids yet</span>';
-
-        card.innerHTML = `
-            <div class="item-image">
-                <img src="${item.image}" alt="${item.name}">
-                ${isEnded ? '<div class="ended-overlay">Auction Ended</div>' : ''}
-            </div>
-            <div class="item-details">
-                <h3>${item.name}</h3>
-                <p class="item-description">${item.description}</p>
-                <div class="bid-status">
-                    <div class="bid-info-container">
-                        <div class="current-bid-wrapper">
+                <div class="item-details">
+                    <h3>${item.name}</h3>
+                    <p class="description">${item.description}</p>
+                    <div class="bid-info-wrapper">
+                        <div class="current-bid">
                             <span class="bid-label">Current Bid</span>
                             <span class="bid-amount">KES ${item.currentBid.toLocaleString()}</span>
                         </div>
-                        <div class="time-wrapper ${isEnded ? 'ended' : ''}">
+                        <div class="time-wrapper ${calculateTimeLeft(item.endTime) === 'Auction ended' ? 'ended' : ''}">
                             <span class="time-label">Time Left</span>
-                            <span class="time-left" data-end-time="${item.endTime}">${timeLeft}</span>
+                            <span class="time-left" data-end-time="${item.endTime}">
+                                ${calculateTimeLeft(item.endTime)}
+                            </span>
                         </div>
                     </div>
-                    ${bidHistoryButton}
+                    <div class="action-buttons">
+                        ${calculateTimeLeft(item.endTime) !== 'Auction ended' ? 
+                            `<button class="bid-button" onclick="showBidModal(${item.id})">
+                                Place Bid
+                            </button>` : 
+                            '<div class="auction-ended">Auction Ended</div>'
+                        }
+                        <button class="view-details-btn" onclick="showBidDetails(${item.id})">
+                            More Info
+                        </button>
+                    </div>
                 </div>
-                ${!isEnded ? `
-                    <button onclick="placeBid('${item.id}', ${item.currentBid})" class="bid-button">
-                        Place Bid
-                    </button>
-                ` : ''}
             </div>
         `;
-        container.appendChild(card);
-    });
+    }).join('');
+
+    // Remove the setupItemCardListeners call since we're using onclick attributes
 }
 
-// Update the placeBid function to handle minimum bid amounts properly
-function placeBid(itemId, currentBid) {
+// Update showBidModal function
+function showBidModal(itemId) {
     if (!isLoggedIn()) {
         showLoginPrompt();
         return;
@@ -331,45 +357,18 @@ function placeBid(itemId, currentBid) {
     }
 
     const bidModal = document.getElementById('bidModal');
-    const bidForm = document.getElementById('bidForm');
-    const bidAmountInput = document.getElementById('bidAmount');
-    const bidHint = document.querySelector('.bid-hint');
+    updateBidModal(item);
+    showModal(bidModal);
 
-    // Set minimum bid amount (1 more than current bid)
-    const minimumBid = currentBid + 1;
-    bidAmountInput.min = minimumBid;
-    bidAmountInput.value = minimumBid;
-
-    // Update bid hint to show minimum bid
-    if (bidHint) {
-        bidHint.textContent = `Minimum bid: KES ${minimumBid.toLocaleString()}`;
-    }
-
-    // Show the modal
-    bidModal.style.display = 'block';
-
-    // Handle bid submission
-    bidForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const bidAmount = Number(bidAmountInput.value);
-
-        if (bidAmount < minimumBid) {
-            showToast(`Bid must be at least KES ${minimumBid.toLocaleString()}`, 'error');
-            return;
-        }
-
-        try {
-            await submitBid(itemId, bidAmount);
-            bidModal.style.display = 'none';
-            bidForm.reset();
-            showToast('Bid placed successfully!', 'success');
-        } catch (error) {
-            showToast('Failed to place bid: ' + error.message, 'error');
+    // Add click handler for closing modal by clicking outside
+    bidModal.onclick = (e) => {
+        if (e.target === bidModal) {
+            hideModal(bidModal);
         }
     };
 }
 
-// Update the bid modal HTML to include better information
+// Update updateBidModal function
 function updateBidModal(item) {
     const modalContent = document.querySelector('#bidModal .modal-content');
     modalContent.innerHTML = `
@@ -380,7 +379,7 @@ function updateBidModal(item) {
             <div class="current-bid">Current Bid: KES ${item.currentBid.toLocaleString()}</div>
             <div class="minimum-bid">Minimum Bid: KES ${(item.currentBid + 1).toLocaleString()}</div>
         </div>
-        <form id="bidForm">
+        <form id="bidForm" data-item-id="${item.id}">
             <div class="form-group">
                 <label for="bidAmount">Your Bid Amount (KES):</label>
                 <input type="number" 
@@ -395,43 +394,52 @@ function updateBidModal(item) {
         </form>
     `;
 
-    // Reattach close button handler
+    // Update close button handler
     const closeButton = modalContent.querySelector('.close');
     closeButton.onclick = () => {
-        document.getElementById('bidModal').style.display = 'none';
+        hideModal(document.getElementById('bidModal'));
     };
-}
 
-function showBidHistory(itemId) {
-    if (!isLoggedIn()) {
-        showLoginPrompt();
-        return;
-    }
-
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-content bid-history-modal">
-            <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
-            <h2>Bid History</h2>
-            <div class="bid-history-container">
-                <div id="bidHistoryContent">Loading...</div>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    modal.style.display = 'block';
-
-    loadBidHistory(itemId);
+    // Add form submission handler
+    const bidForm = modalContent.querySelector('#bidForm');
+    bidForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const bidAmount = parseInt(document.getElementById('bidAmount').value);
+        const itemId = bidForm.getAttribute('data-item-id');
+        
+        try {
+            await submitBid(itemId, bidAmount);
+            hideModal(document.getElementById('bidModal'));
+            // Check if no other modals are visible before restoring scroll
+            const visibleModals = document.querySelectorAll('.modal.visible');
+            if (visibleModals.length === 0) {
+                document.body.style.overflow = '';
+            }
+        } catch (error) {
+            console.error('Bid error:', error);
+            showToast('Failed to place bid. Please try again.', 'error');
+        }
+    };
 }
 
 function isLoggedIn() {
     return !!localStorage.getItem('user');
 }
 
+// Update showLoginPrompt function
 function showLoginPrompt() {
+    // Close any existing modals first
+    document.querySelectorAll('.modal.visible').forEach(modal => {
+        hideModal(modal);
+        // If it's a dynamically created modal, remove it from DOM
+        if (!modal.id) {
+            modal.remove();
+        }
+    });
+
+    // Show login modal
     const loginModal = document.getElementById('loginModal');
-    loginModal.style.display = 'block';
+    showModal(loginModal);
     showToast('Please login to continue', 'info');
 }
 
@@ -459,50 +467,62 @@ function setupModalHandlers() {
     const loginBtn = document.getElementById('loginBtn');
     const registerBtn = document.getElementById('registerBtn');
     
-    // Get all close buttons
-    const closeButtons = document.querySelectorAll('.close');
+    // Remove existing event listeners if any
+    loginBtn.replaceWith(loginBtn.cloneNode(true));
+    registerBtn.replaceWith(registerBtn.cloneNode(true));
     
-    // Get modal switch links
-    const switchModalLinks = document.querySelectorAll('.switch-modal');
-
+    // Get the fresh elements
+    const newLoginBtn = document.getElementById('loginBtn');
+    const newRegisterBtn = document.getElementById('registerBtn');
+    
     // Setup login button
-    loginBtn.onclick = () => {
-        loginModal.style.display = 'block';
-        registerModal.style.display = 'none';
+    newLoginBtn.onclick = () => {
+        const loginModal = document.getElementById('loginModal');
+        const loginButton = loginModal.querySelector('button[type="submit"]');
+        if (loginButton) loginButton.textContent = 'Login';
+        showModal(loginModal);
+        hideModal(document.getElementById('registerModal'));
     };
 
     // Setup register button
-    registerBtn.onclick = () => {
-        registerModal.style.display = 'block';
-        loginModal.style.display = 'none';
+    newRegisterBtn.onclick = () => {
+        const registerModal = document.getElementById('registerModal');
+        const registerButton = registerModal.querySelector('button[type="submit"]');
+        if (registerButton) registerButton.textContent = 'Create Account';
+        showModal(registerModal);
+        hideModal(document.getElementById('loginModal'));
     };
-
+    
     // Setup close buttons
-    closeButtons.forEach(button => {
+    document.querySelectorAll('.close').forEach(button => {
         button.onclick = function() {
-            this.closest('.modal').style.display = 'none';
+            hideModal(this.closest('.modal'));
         };
     });
-
-    // Setup modal switch links
-    switchModalLinks.forEach(link => {
+    
+    // Setup modal switch links with button text preservation
+    document.querySelectorAll('.switch-modal').forEach(link => {
         link.onclick = (e) => {
             e.preventDefault();
-            const targetModal = link.getAttribute('data-target');
-            if (targetModal === 'loginModal') {
-                loginModal.style.display = 'block';
-                registerModal.style.display = 'none';
-            } else {
-                registerModal.style.display = 'block';
-                loginModal.style.display = 'none';
-            }
+            const targetModal = document.getElementById(link.getAttribute('data-target'));
+            const currentModal = link.closest('.modal');
+            
+            // Ensure correct button text before switching
+            const loginButton = document.querySelector('#loginForm button[type="submit"]');
+            const registerButton = document.querySelector('#registerForm button[type="submit"]');
+            if (loginButton) loginButton.textContent = 'Login';
+            if (registerButton) registerButton.textContent = 'Create Account';
+            
+            hideModal(currentModal);
+            showModal(targetModal);
+            setupPasswordToggles();
         };
     });
-
+    
     // Close modal when clicking outside
     window.onclick = (event) => {
         if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
+            hideModal(event.target);
         }
     };
 
@@ -510,10 +530,15 @@ function setupModalHandlers() {
     const loginForm = document.getElementById('loginForm');
     loginForm.onsubmit = async (e) => {
         e.preventDefault();
-        const username = document.getElementById('loginUsername').value;
-        const password = document.getElementById('loginPassword').value;
-        
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = 'Logging in...';
+
         try {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
             // Check registered users in localStorage first
             const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
             let user = registeredUsers.find(u => 
@@ -536,7 +561,7 @@ function setupModalHandlers() {
                     email: user.email,
                     isAdmin: user.isAdmin || false
                 }));
-                loginModal.style.display = 'none';
+                hideModal(loginModal);
                 updateUserInterface();
                 showToast(`Welcome back, ${user.username}!`, 'success');
             } else {
@@ -545,6 +570,9 @@ function setupModalHandlers() {
         } catch (error) {
             console.error('Login error:', error);
             showToast('Unable to process login. Please try again later.', 'error');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
         }
     };
 
@@ -552,9 +580,10 @@ function setupModalHandlers() {
     const registerForm = document.getElementById('registerForm');
     registerForm.onsubmit = async (e) => {
         e.preventDefault();
-        const username = document.getElementById('regUsername').value.trim();
-        const email = document.getElementById('regEmail').value.trim();
-        const password = document.getElementById('regPassword').value;
+        const submitButton = registerForm.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent; // Store original text
+        submitButton.disabled = true;
+        submitButton.textContent = 'Creating Account...';
 
         try {
             await validateRegistration(username, email, password);
@@ -573,13 +602,46 @@ function setupModalHandlers() {
             localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
 
             showToast(`Account created successfully! Welcome, ${username}. Please login to continue.`, 'success');
-            registerModal.style.display = 'none';
-            loginModal.style.display = 'block';
+            hideModal(registerModal);
+            showModal(loginModal);
             registerForm.reset();
-        } catch (error) {
-            showToast(error.message, 'error');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;  // Restore original text
         }
     };
+
+    // Update bid form submission
+    const bidForm = document.getElementById('bidForm');
+    bidForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const bidAmount = parseInt(document.getElementById('bidAmount').value);
+        const itemId = bidForm.getAttribute('data-item-id');
+        
+        try {
+            // Add loading state
+            const submitButton = bidForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Placing Bid...';
+
+            await submitBid(itemId, bidAmount);
+            hideModal(document.getElementById('bidModal'));
+            ensureScrollRestored();
+        } catch (error) {
+            console.error('Bid error:', error);
+            showToast('Failed to place bid. Please try again.', 'error');
+        } finally {
+            // Reset form and button state
+            const submitButton = bidForm.querySelector('button[type="submit"]');
+            submitButton.disabled = false;
+            submitButton.textContent = 'Place Bid';
+        }
+    };
+
+    // Add cleanup for dynamically created modals
+    window.addEventListener('beforeunload', () => {
+        document.body.style.overflow = '';
+    });
 }
 
 // Function to update UI based on login state
@@ -593,9 +655,9 @@ function updateUserInterface() {
         authButtons.style.display = 'none';
         userInfo.innerHTML = `
             <span>Welcome, ${user.username}!</span>
-            <button onclick="showMyBids()" class="btn-secondary my-bids-button">My Bids</button>
-            ${user.isAdmin ? '<button onclick="resetAuctionData()" class="btn-secondary reset-button">Reset Auctions</button>' : ''}
-            <button onclick="logout()" class="btn-secondary">Logout</button>
+            <button onclick="showMyBids()" class="my-bids-button">My Bids</button>
+            ${user.isAdmin ? '<button onclick="resetAuctionData()" id="resetAuctionsBtn">Reset Auctions</button>' : ''}
+            <button onclick="logout()" id="logoutBtn">Logout</button>
         `;
         userInfo.style.display = 'flex';
     } else {
@@ -603,6 +665,9 @@ function updateUserInterface() {
         authButtons.style.display = 'flex';
         userInfo.style.display = 'none';
     }
+
+    // Refresh the items display
+    displayFilteredItems(allItems);
 }
 
 // Logout function
@@ -610,14 +675,12 @@ function logout() {
     const user = JSON.parse(localStorage.getItem('user'));
     localStorage.removeItem('user');
     updateUserInterface();
+    
+    // Re-initialize all event listeners and UI
+    initializeApp();
+    
     showToast(`Goodbye, ${user.username}! You've been logged out successfully`, 'info');
 }
-
-// Call updateUserInterface when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    updateUserInterface();
-    // ... rest of your DOMContentLoaded code ...
-});
 
 // Add a function to reset the auction data (useful for testing)
 function resetAuctionData() {
@@ -643,7 +706,7 @@ function showMyBids() {
     modal.className = 'modal';
     modal.innerHTML = `
         <div class="modal-content bid-history-modal">
-            <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+            <span class="close">&times;</span>
             <h2>My Bids</h2>
             <div class="bid-history-container">
                 ${myBids.length === 0 ? '<p class="no-bids-message">You haven\'t placed any bids yet</p>' :
@@ -664,24 +727,53 @@ function showMyBids() {
         </div>
     `;
     document.body.appendChild(modal);
-    modal.style.display = 'block';
+    showModal(modal);
+
+    // Update close button handler
+    const closeButton = modal.querySelector('.close');
+    closeButton.onclick = () => {
+        hideModal(modal);
+        setTimeout(() => {
+            modal.remove();
+            ensureScrollRestored();
+        }, 300);
+    };
+
+    // Update click outside handler
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            hideModal(modal);
+            setTimeout(() => {
+                modal.remove();
+                ensureScrollRestored();
+            }, 300);
+        }
+    });
 }
 
-// Add password toggle functionality
+// Update setupPasswordToggles function
 function setupPasswordToggles() {
     const passwordToggles = document.querySelectorAll('.password-toggle');
     passwordToggles.forEach(toggle => {
-        toggle.addEventListener('click', (e) => {
-            const button = e.currentTarget;
-            const input = button.parentElement.querySelector('input');
+        // Remove existing listener if any
+        const newToggle = toggle.cloneNode(true);
+        toggle.parentNode.replaceChild(newToggle, toggle);
+        
+        newToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const input = this.previousElementSibling;
             const type = input.type === 'password' ? 'text' : 'password';
             input.type = type;
             
             // Update icon based on password visibility
-            const path = button.querySelector('path');
+            const path = this.querySelector('path');
             if (type === 'text') {
-                path.setAttribute('d', 'M12 6.5c-3.79 0-7.17 2.13-8.82 5.5 1.65 3.37 5.02 5.5 8.82 5.5s7.17-2.13 8.82-5.5C19.17 8.63 15.79 6.5 12 6.5zm0 9c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zm0-4c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z');
+                // Eye icon with line through it (hidden password)
+                path.setAttribute('d', 'M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z');
             } else {
+                // Regular eye icon (visible password)
                 path.setAttribute('d', 'M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z');
             }
         });
@@ -735,4 +827,322 @@ async function validateRegistration(username, email, password) {
 
     return true;
 }
+
+// Update the updateBidMetrics function for better calculations
+function updateBidMetrics(item) {
+    if (!item.bidHistory || item.bidHistory.length === 0) {
+        item.bidMetrics = {
+            totalBids: 0,
+            uniqueBidders: 0,
+            averageBidIncrement: 0,
+            highestBid: 0,
+            lowestBid: 0,
+            bidRange: 0
+        };
+        return;
+    }
+
+    // Sort bids by amount for calculations
+    const sortedBids = [...item.bidHistory].sort((a, b) => a.amount - b.amount);
+    
+    // Calculate bid increments between consecutive bids
+    const bidIncrements = [];
+    for (let i = 1; i < item.bidHistory.length; i++) {
+        const increment = item.bidHistory[i].amount - item.bidHistory[i-1].amount;
+        bidIncrements.push(increment);
+    }
+
+    // Calculate metrics
+    const metrics = {
+        totalBids: item.bidHistory.length,
+        uniqueBidders: new Set(item.bidHistory.map(bid => bid.userId)).size,
+        averageBidIncrement: bidIncrements.length > 0 
+            ? Math.round(bidIncrements.reduce((a, b) => a + b, 0) / bidIncrements.length) 
+            : 0,
+        highestBid: sortedBids[sortedBids.length - 1].amount,
+        lowestBid: sortedBids[0].amount,
+        bidRange: sortedBids[sortedBids.length - 1].amount - sortedBids[0].amount,
+        lastBidTime: new Date(Math.max(...item.bidHistory.map(bid => new Date(bid.timestamp)))),
+        bidFrequency: calculateBidFrequency(item.bidHistory)
+    };
+
+    item.bidMetrics = metrics;
+}
+
+// Add helper function to calculate bid frequency
+function calculateBidFrequency(bidHistory) {
+    if (bidHistory.length < 2) return 0;
+    
+    const timestamps = bidHistory.map(bid => new Date(bid.timestamp));
+    const timeIntervals = [];
+    
+    for (let i = 1; i < timestamps.length; i++) {
+        const interval = timestamps[i] - timestamps[i-1];
+        timeIntervals.push(interval);
+    }
+    
+    // Average time between bids in minutes
+    return Math.round(timeIntervals.reduce((a, b) => a + b, 0) / timeIntervals.length / 60000);
+}
+
+// Update the showBidDetails function
+function showBidDetails(itemId) {
+    const item = allItems.find(item => item.id === parseInt(itemId));
+    if (!item) return;
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content bid-history-modal">
+            <span class="close" onclick="this.closest('.modal').remove(); document.body.style.overflow = '';">&times;</span>
+            <h2>${item.name}</h2>
+            <div class="item-details-content">
+                <div class="item-image">
+                    <img src="${item.image}" alt="${item.name}">
+                </div>
+                <div class="item-info">
+                    <p class="description">${item.description}</p>
+                    <div class="current-price">
+                        Current Bid: KES ${item.currentBid.toLocaleString()}
+                    </div>
+                    <div class="time-info">
+                        Time Left: <span class="time-left" data-end-time="${item.endTime}">${calculateTimeLeft(item.endTime)}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bid-metrics">
+                <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-value">${item.bidHistory?.length || 0}</div>
+                    <div class="metric-label">Total Bids</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">👥</div>
+                    <div class="metric-value">${new Set(item.bidHistory?.map(bid => bid.username) || []).size}</div>
+                    <div class="metric-label">Unique Bidders</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-value">KES ${item.currentBid.toLocaleString()}</div>
+                    <div class="metric-label">Current Bid</div>
+                </div>
+            </div>
+
+            <div class="bid-history-container">
+                <h3>Bid History</h3>
+                ${!item.bidHistory || item.bidHistory.length === 0 ? 
+                    '<p class="no-bids-message">No bids have been placed yet. Be the first to bid!</p>' :
+                    `<div class="bid-list">
+                        ${item.bidHistory
+                            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                            .map(bid => `
+                                <div class="bid-entry">
+                                    <div class="bid-info-main">
+                                        <span class="bid-amount">KES ${bid.amount.toLocaleString()}</span>
+                                        <span class="bidder">${bid.username}</span>
+                                    </div>
+                                    <div class="bid-info-secondary">
+                                        <span class="bid-time">${new Date(bid.timestamp).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                    </div>`
+                }
+            </div>
+            
+            ${calculateTimeLeft(item.endTime) !== 'Auction ended' ? 
+                `<div class="modal-actions">
+                    <button onclick="closeBidDetailsAndShowBidModal(${item.id})" class="btn-primary">
+                        Place Bid
+                    </button>
+                </div>` : 
+                '<div class="auction-ended-message">This auction has ended</div>'
+            }
+        </div>
+    `;
+    document.body.appendChild(modal);
+    showModal(modal);
+
+    // Update modal click handler
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            hideModal(modal);
+            setTimeout(() => {
+                modal.remove();
+                // Check if no other modals are visible before restoring scroll
+                const visibleModals = document.querySelectorAll('.modal.visible');
+                if (visibleModals.length === 0) {
+                    document.body.style.overflow = '';
+                }
+            }, 300);
+        }
+    });
+}
+
+// Update the transition helper function
+function closeBidDetailsAndShowBidModal(itemId) {
+    const detailsModal = document.querySelector('.bid-history-modal').closest('.modal');
+    
+    // Start fading out the details modal
+    detailsModal.style.transition = 'opacity 0.2s ease-out';
+    detailsModal.style.opacity = '0';
+    
+    // After fade out, remove details modal and show bid modal
+    setTimeout(() => {
+        hideModal(detailsModal);
+        detailsModal.remove();
+        
+        // Show bid modal immediately after
+        const bidModal = document.getElementById('bidModal');
+        showBidModal(itemId);
+        
+        // Add fade-in effect to bid modal
+        bidModal.style.transition = 'opacity 0.2s ease-in';
+        bidModal.style.opacity = '0';
+        requestAnimationFrame(() => {
+            bidModal.style.opacity = '1';
+        });
+    }, 200); // Match the transition duration
+}
+
+// Update showModal function to include fade effect
+function showModal(modal) {
+    if (!modal) return;
+    
+    // Set correct button text based on modal type
+    if (modal.id === 'loginModal') {
+        const loginButton = modal.querySelector('button[type="submit"]');
+        if (loginButton) loginButton.textContent = 'Login';
+    } else if (modal.id === 'registerModal') {
+        const registerButton = modal.querySelector('button[type="submit"]');
+        if (registerButton) registerButton.textContent = 'Create Account';
+    }
+    
+    modal.style.display = 'block';
+    modal.classList.add('visible');
+    
+    // Add fade-in effect
+    modal.style.transition = 'opacity 0.2s ease-in';
+    modal.style.opacity = '0';
+    requestAnimationFrame(() => {
+        modal.style.opacity = '1';
+    });
+    
+    // Handle scroll as before
+    const visibleModals = document.querySelectorAll('.modal.visible');
+    if (visibleModals.length === 1) {
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+// Update hideModal function to include fade effect
+function hideModal(modal) {
+    if (!modal) return;
+    
+    // Cancel any pending form submissions
+    const forms = modal.querySelectorAll('form');
+    forms.forEach(form => {
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = submitButton.getAttribute('data-original-text') || 'Submit';
+        }
+    });
+    
+    // Add fade-out effect
+    modal.style.transition = 'opacity 0.2s ease-out';
+    modal.style.opacity = '0';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        modal.classList.remove('visible');
+        ensureScrollRestored();
+    }, 200);
+}
+
+// Add a helper function to ensure scroll is restored
+function ensureScrollRestored() {
+    const visibleModals = document.querySelectorAll('.modal.visible');
+    if (visibleModals.length === 0) {
+        document.body.style.overflow = '';
+    }
+}
+
+// Update the placeBid function
+function placeBid(itemId, currentBid) {
+    if (!isLoggedIn()) {
+        showLoginPrompt();
+        return;
+    }
+
+    const item = allItems.find(item => item.id === parseInt(itemId));
+    if (!item) {
+        showToast('Item not found', 'error');
+        return;
+    }
+
+    const bidModal = document.getElementById('bidModal');
+    
+    // Update modal content
+    updateBidModal(item);
+    
+    // Show the modal
+    bidModal.style.display = 'block';
+}
+
+// Add to your existing event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    setupPasswordToggles();
+});
+
+// Add to your modal show functions
+function showLoginModal() {
+    // ... existing code ...
+    setupPasswordToggles();
+}
+
+function showRegisterModal() {
+    // ... existing code ...
+    setupPasswordToggles();
+}
+
+// Add to your modal switch function
+function switchModal(from, to) {
+    const fromModal = document.getElementById(from);
+    const toModal = document.getElementById(to);
+    
+    hideModal(fromModal);
+    
+    setTimeout(() => {
+        showModal(toModal);
+        fromModal.querySelector('form').reset();
+        
+        // Reset button text based on form type
+        if (to === 'loginModal') {
+            toModal.querySelector('button[type="submit"]').textContent = 'Login';
+        } else if (to === 'registerModal') {
+            toModal.querySelector('button[type="submit"]').textContent = 'Create Account';
+        }
+        
+        setupPasswordToggles();
+    }, 200);
+}
+
+// Update form submission handlers
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    submitButton.textContent = 'Login'; // Ensure text stays as Login
+    // ... rest of login logic
+});
+
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    submitButton.textContent = 'Create Account'; // Ensure text stays as Create Account
+    // ... rest of registration logic
+});
   
