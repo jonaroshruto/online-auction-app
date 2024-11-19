@@ -121,17 +121,6 @@ Username: collector  Password: collect123
 - No backend required - perfect for frontend development and testing
 - Modular code structure for easy maintenance
 
-## Future Enhancements
-
-- Real-time notifications
-- Social sharing features
-- Advanced bidding options
-- User profiles and ratings
-- Payment system integration
-- Admin dashboard
-- Chat system
-- Email notifications
-
 ## Contributing
 
 1. Fork the repository

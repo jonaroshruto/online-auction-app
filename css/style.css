@@ -168,29 +168,127 @@ main {
 }
 
 .item-card {
-    display: flex;
-    flex-direction: column;
     background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    border-radius: 12px;
     overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
-    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
 }
 
 .item-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.item-card img {
-    width: 100%;
+.item-image {
+    position: relative;
     height: 200px;
-    object-fit: cover;
+    overflow: hidden;
 }
 
-.item-card-content {
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.item-card:hover .item-image img {
+    transform: scale(1.05);
+}
+
+.ended-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.item-details {
     padding: 1.5rem;
+}
+
+.item-details h3 {
+    margin: 0 0 0.5rem;
+    color: #2c3e50;
+    font-size: 1.25rem;
+}
+
+.item-description {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.bid-info-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.current-bid-wrapper, .time-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.bid-label, .time-label {
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bid-amount {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2e7d32;
+}
+
+.time-left {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2196F3;
+}
+
+.time-wrapper.ended .time-left {
+    color: #f44336;
+}
+
+.auction-ended-card {
+    opacity: 0.8;
+}
+
+.bid-button {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    margin-top: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .bid-info-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
 }
 
 .modal {
@@ -448,6 +546,8 @@ footer {
 
 .bid-button:hover {
     background-color: var(--secondary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .auction-ended {
@@ -477,5 +577,427 @@ footer {
     border-top: 1px solid #eee;
     text-align: center;
     color: #666;
+}
+
+/* Bid Modal Styles */
+#bidModal .modal-content {
+    max-width: 400px;
+}
+
+.bid-info {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin: 1rem 0;
+}
+
+.current-bid, .minimum-bid {
+    font-size: 1.1rem;
+    margin: 0.5rem 0;
+}
+
+.current-bid {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.minimum-bid {
+    color: #666;
+}
+
+.bid-hint {
+    display: block;
+    margin-top: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+#bidAmount {
+    font-size: 1.2rem;
+    padding: 0.8rem;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    margin-top: 0.5rem;
+}
+
+#bidAmount:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+/* Toast Notifications */
+.toast-notification {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s ease-out;
+    z-index: 1000;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.toast-icon {
+    font-size: 1.25rem;
+}
+
+/* Toast types */
+.toast-notification.success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.toast-notification.error {
+    background-color: #f44336;
+    color: white;
+}
+
+.toast-notification.info {
+    background-color: #2196F3;
+    color: white;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.fade-out {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Stack multiple toasts */
+.toast-notification + .toast-notification {
+    margin-bottom: 1rem;
+}
+
+/* Bid Status in Cards */
+.bid-status {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin: 1rem 0;
+}
+
+.bid-info-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 0.5rem;
+}
+
+.current-bid-wrapper, .time-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.bid-label, .time-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.bid-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2e7d32;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.bid-amount::before {
+    content: 'KES';
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #666;
+}
+
+.time-left {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2196F3;
+}
+
+.time-wrapper.ended .time-left {
+    color: #f44336;
+}
+
+/* Bid History Button styling */
+.bid-history-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.2rem;
+    background: #e8f5e9;
+    border: 1px solid #4caf50;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #2e7d32;
+    font-weight: 500;
+    margin-top: 1rem;
+    width: fit-content;
+    gap: 1rem;
+}
+
+.bid-history-button:hover {
+    background: #c8e6c9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+}
+
+.bid-count-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.bid-count {
+    background: #4caf50;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.bid-text {
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+.view-all {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+/* Bid History Modal */
+.bid-history-modal {
+    max-width: 600px;
+    max-height: 80vh;
+}
+
+.bid-history-container {
+    margin-top: 1.5rem;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.current-price {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2e7d32;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #e8f5e9;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.bid-entry {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.bid-entry.latest-bid {
+    border: 1px solid #4caf50;
+    background: #f1f8e9;
+}
+
+.bid-info-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.bid-info-secondary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.latest-badge {
+    background: #4caf50;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.no-bids-message {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 1rem;
+}
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+.toast-notification.info {
+    border-left: 4px solid #2196F3;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Place Bid Button */
+.bid-button {
+    display: block;
+    width: 100%;
+    padding: 0.8rem 1.2rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-top: 1rem;
+}
+
+.bid-button:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Add styles for the reset button */
+.btn-secondary.reset-button {
+    margin-left: 1rem;
+    background-color: #f44336;
+    color: white;
+    border: none;
+}
+
+.btn-secondary.reset-button:hover {
+    background-color: #d32f2f;
+}
+
+/* My Bids Button */
+.my-bids-button {
+    background-color: var(--primary-color);
+    color: white;
+    margin-right: 1rem;
+}
+
+.my-bids-button:hover {
+    background-color: var(--secondary-color);
+}
+
+/* My Bids Modal */
+.item-name {
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.bid-entry .bid-time {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Password Input Styling */
+.password-input-group .password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle:hover {
+    opacity: 0.8;
+}
+
+.eye-icon {
+    fill: #666;
+    width: 20px;
+    height: 20px;
+}
+
+.password-wrapper input {
+    padding-right: 40px;
 }
   

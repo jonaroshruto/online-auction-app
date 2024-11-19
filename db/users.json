@@ -1,6 +1,14 @@
 {
   "users": [
     {
+      "id": 0,
+      "username": "admin",
+      "password": "admin12",
+      "email": "admin@example.com",
+      "isAdmin": true,
+      "bids": []
+    },
+    {
       "id": 1,
       "username": "demo",
       "password": "demo123",
