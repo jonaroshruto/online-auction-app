@@ -1,0 +1,124 @@
+{
+    "items": [
+        {
+            "id": 1,
+            "name": "iPhone 15 Pro Max",
+            "description": "Latest iPhone 15 Pro Max 256GB in Natural Titanium. Features A17 Pro chip, 48MP camera system, and Action button. Factory sealed.",
+            "image": "https://via.placeholder.com/300x300?text=iPhone15",
+            "currentBid": 999,
+            "startingBid": 900,
+            "seller": "techstore",
+            "startTime": "2024-11-15T10:00:00",
+            "endTime": "2024-12-15T10:00:00",
+            "bidHistory": []
+        },
+        {
+            "id": 2,
+            "name": "PS5 Pro Limited Edition",
+            "description": "PlayStation 5 Pro Limited Edition Bundle with Spider-Man 2, DualSense controller, and 1TB SSD. Exclusive design.",
+            "image": "https://via.placeholder.com/300x300?text=PS5Pro",
+            "currentBid": 599,
+            "startingBid": 550,
+            "seller": "gameworld",
+            "startTime": "2024-11-10T10:00:00",
+            "endTime": "2024-12-10T10:00:00",
+            "bidHistory": []
+        },
+        {
+            "id": 3,
+            "name": "1985 Rolex Submariner",
+            "description": "Vintage 1985 Rolex Submariner Ref. 16800. Original box and papers, serviced in 2023. Excellent condition with minimal wear.",
+            "image": "https://via.placeholder.com/300x300?text=Rolex",
+            "currentBid": 8500,
+            "startingBid": 8000,
+            "seller": "luxurywatches",
+            "startTime": "2024-11-01T10:00:00",
+            "endTime": "2024-11-15T10:00:00",
+            "bidHistory": []
+        },
+        {
+            "id": 4,
+            "name": "MacBook Pro M3 Max",
+            "description": "2024 MacBook Pro 16\" with M3 Max chip, 32GB RAM, 2TB SSD. Space Black finish. AppleCare+ included until 2027.",
+            "image": "https://via.placeholder.com/300x300?text=MacBookPro",
+            "currentBid": 2499,
+            "startingBid": 2400,
+            "seller": "techstore",
+            "startTime": "2024-11-18T10:00:00",
+            "endTime": "2024-12-18T10:00:00",
+            "bidHistory": []
+        },
+        {
+            "id": 5,
+            "name": "Tesla Model 3 Highland",
+            "description": "2024 Tesla Model 3 Highland Edition. Long Range AWD, White exterior, Black interior. 0 miles, full warranty.",
+            "image": "https://via.placeholder.com/300x300?text=TeslaModel3",
+            "currentBid": 42000,
+            "startingBid": 40000,
+            "seller": "evdealer",
+            "startTime": "2024-11-20T10:00:00",
+            "endTime": "2024-12-20T10:00:00",
+            "bidHistory": []
+        },
+        {
+            "id": 6,
+            "name": "Rare Pokemon Card Collection",
+            "description": "Complete First Edition Base Set (1999) in PSA 9-10 condition. Includes PSA 10 Charizard. All cards professionally graded.",
+            "image": "https://via.placeholder.com/300x300?text=Pokemon",
+            "currentBid": 150000,
+            "startingBid": 140000,
+            "seller": "collectibles",
+            "startTime": "2024-10-19T10:00:00",
+            "endTime": "2024-11-18T10:00:00",
+            "bidHistory": []
+        },
+        {
+            "id": 7,
+            "name": "RTX 4090 Gaming PC",
+            "description": "Custom Gaming PC: RTX 4090, Intel i9-14900K, 64GB DDR5, 4TB NVMe SSD, Custom Water Cooling, Lian Li Case.",
+            "image": "https://via.placeholder.com/300x300?text=GamingPC",
+            "currentBid": 3499,
+            "startingBid": 3000,
+            "seller": "pcbuilder",
+            "startTime": "2024-11-25T10:00:00",
+            "endTime": "2024-12-25T10:00:00",
+            "bidHistory": []
+        },
+        {
+            "id": 8,
+            "name": "Signed Jordan Jersey 1998",
+            "description": "Michael Jordan signed Chicago Bulls jersey from 1998 Finals. PSA/DNA authenticated. Includes display case and certificate.",
+            "image": "https://via.placeholder.com/300x300?text=Jordan",
+            "currentBid": 25000,
+            "startingBid": 20000,
+            "seller": "sportsauction",
+            "startTime": "2024-10-01T10:00:00",
+            "endTime": "2024-11-01T10:00:00",
+            "bidHistory": []
+        },
+        {
+            "id": 9,
+            "name": "Gibson Les Paul 1959 Reissue",
+            "description": "2024 Gibson Custom Shop 1959 Les Paul Standard Reissue. Murphy Lab aged, Brazilian Rosewood fingerboard. Includes original case.",
+            "image": "https://via.placeholder.com/300x300?text=Gibson",
+            "currentBid": 12799,
+            "startingBid": 12500,
+            "seller": "musicstore",
+            "startTime": "2024-11-21T10:00:00",
+            "endTime": "2024-12-21T10:00:00",
+            "bidHistory": []
+        },
+        {
+            "id": 10,
+            "name": "Maldives Luxury Villa Package",
+            "description": "7-night stay in overwater villa at Waldorf Astoria Maldives. Includes seaplane transfers, meals, spa treatments, and activities.",
+            "image": "https://via.placeholder.com/300x300?text=Maldives",
+            "currentBid": 12000,
+            "startingBid": 10000,
+            "seller": "luxurytravel",
+            "startTime": "2024-11-30T10:00:00",
+            "endTime": "2024-12-30T10:00:00",
+            "bidHistory": []
+        }
+    ]
+} 

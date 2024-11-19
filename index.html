@@ -3,78 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Online Auction</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="description" content="Online Auction System - Bid on exclusive items">
+    <title>Online Auction System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Add favicon -->
+    <link rel="icon" type="image/x-icon" href="https://via.placeholder.com/32x32?text=A">
 </head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal">
-    <!-- Navigation Bar -->
-    <header class="bg-blue-600 text-white shadow-md">
-        <nav class="container mx-auto p-4 flex justify-between items-center">
-            <div>
-                <a href="#" class="text-xl font-bold">AuctionHub</a>
-            </div>
-            <div class="space-x-6">
-                <a href="#" class="hover:underline">Home</a>
-                <a href="#" class="hover:underline">Browse Auctions</a>
-                <a href="#" class="hover:underline">My Auctions</a>
-                <a href="#" class="hover:underline">Contact Us</a>
-                <a href="#" class="bg-blue-700 py-2 px-4 rounded hover:bg-blue-800">Login</a>
-            </div>
-        </nav>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Online Auction System</h1>
+            <nav>
+                <div class="user-info"></div>
+                <div class="auth-buttons">
+                    <button id="loginBtn" class="btn-primary">Login</button>
+                    <button id="registerBtn" class="btn-secondary">Register</button>
+                </div>
+            </nav>
+        </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="bg-cover bg-center h-screen text-white" style="background-image: url('https://example.com/auction-banner.jpg');">
-        <div class="container mx-auto h-full flex items-center justify-center text-center">
-            <div class="bg-opacity-50 bg-black p-10 rounded">
-                <h1 class="text-5xl font-bold mb-6">Welcome to AuctionHub</h1>
-                <p class="text-xl mb-6">Bid on exclusive items and win your dream deals</p>
-                <a href="#" class="bg-blue-600 py-3 px-6 rounded-full text-lg hover:bg-blue-700">Start Bidding</a>
+    <main>
+        <section class="auction-items">
+            <div class="section-header">
+                <h2>Current Auctions</h2>
+                <div class="filters">
+                    <input type="text" id="searchInput" placeholder="Search auctions...">
+                    <select id="sortSelect">
+                        <option value="ending-soon">Ending Soon</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="newest">Newest First</option>
+                    </select>
+                </div>
+            </div>
+            <div id="itemsContainer" class="items-grid"></div>
+        </section>
+
+        <!-- Login Modal -->
+        <div id="loginModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Login to Your Account</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">Username:</label>
+                        <input type="text" id="loginUsername" required 
+                               placeholder="Enter your username">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password:</label>
+                        <input type="password" id="loginPassword" required
+                               placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                </form>
+                <p class="modal-footer">
+                    Don't have an account? 
+                    <a href="#" class="switch-modal" data-target="registerModal">Register</a>
+                </p>
             </div>
         </div>
-    </section>
 
-    <!-- Featured Auctions Section -->
-    <section class="container mx-auto py-12">
-        <h2 class="text-3xl font-bold text-center mb-10">Featured Auctions</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Auction Item 1 -->
-            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                <img src="https://example.com/item1.jpg" alt="Item 1" class="w-full h-48 object-cover">
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold">Antique Vase</h3>
-                    <p class="text-gray-700 mt-2">Current Bid: $500</p>
-                    <a href="#" class="text-blue-600 hover:underline mt-4 block">Place Bid</a>
-                </div>
-            </div>
-            <!-- Auction Item 2 -->
-            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                <img src="https://example.com/item2.jpg" alt="Item 2" class="w-full h-48 object-cover">
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold">Vintage Car</h3>
-                    <p class="text-gray-700 mt-2">Current Bid: $25,000</p>
-                    <a href="#" class="text-blue-600 hover:underline mt-4 block">Place Bid</a>
-                </div>
-            </div>
-            <!-- Auction Item 3 -->
-            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                <img src="https://example.com/item3.jpg" alt="Item 3" class="w-full h-48 object-cover">
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold">Luxury Watch</h3>
-                    <p class="text-gray-700 mt-2">Current Bid: $1,200</p>
-                    <a href="#" class="text-blue-600 hover:underline mt-4 block">Place Bid</a>
-                </div>
+        <!-- Register Modal -->
+        <div id="registerModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Create New Account</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="regUsername">Username:</label>
+                        <input type="text" id="regUsername" required
+                               placeholder="Choose a username"
+                               pattern="[A-Za-z0-9_]{3,20}"
+                               title="3-20 characters, letters, numbers and underscore only">
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email:</label>
+                        <input type="email" id="regEmail" required
+                               placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password:</label>
+                        <input type="password" id="regPassword" required
+                               placeholder="Choose a password"
+                               pattern=".{6,}"
+                               title="Six or more characters">
+                    </div>
+                    <button type="submit" class="btn-primary">Register</button>
+                </form>
+                <p class="modal-footer">
+                    Already have an account? 
+                    <a href="#" class="switch-modal" data-target="loginModal">Login</a>
+                </p>
             </div>
         </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8">
-        <div class="container mx-auto text-center">
-            <p>&copy; 2024 AuctionHub. All rights reserved.</p>
-            <p><a href="#" class="text-blue-400 hover:underline">Privacy Policy</a> | <a href="#" class="text-blue-400 hover:underline">Terms of Service</a></p>
+        <!-- Bid Modal -->
+        <div id="bidModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Place Your Bid</h2>
+                <form id="bidForm">
+                    <div class="form-group">
+                        <label for="bidAmount">Bid Amount ($):</label>
+                        <input type="number" id="bidAmount" required
+                               min="0" step="1">
+                        <small class="bid-hint">Enter amount higher than current bid</small>
+                    </div>
+                    <button type="submit" class="btn-primary">Place Bid</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2024 Online Auction System. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Contact Us</a>
+            </div>
         </div>
     </footer>
+
+    <script src="js/main.js"></script>
 </body>
 </html>
